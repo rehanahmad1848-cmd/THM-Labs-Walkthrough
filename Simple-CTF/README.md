@@ -1,0 +1,126 @@
+<div align="center">
+
+# 🏴 Simple CTF — TryHackMe
+![Difficulty](https://img.shields.io/badge/Difficulty-Easy-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen?style=for-the-badge)
+![Platform](https://img.shields.io/badge/Platform-TryHackMe-212C42?style=for-the-badge&logo=tryhackme)
+
+</div>
+# Simple CTF — TryHackMe Walkthrough
+
+A beginner-friendly CTF writeup covering enumeration, web exploitation, and privilege escalation.
+
+---
+
+## 🔍 Enumeration
+
+**Q: How many services are running under port 1000?**  
+**A:** 2
+
+**Q: What is running on the higher port?**  
+**A:** SSH
+
+---
+
+<img width="609" height="171" alt="image" src="https://github.com/user-attachments/assets/b3d88279-f70a-488a-8e92-ccd5ca37ad25" />
+
+
+## 🌐 Web Enumeration with Gobuster
+
+Run directory brute-forcing against the target:
+
+```bash
+sudo gobuster dir -u http://<TARGET_IP>:80 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 100
+```
+<img width="656" height="29" alt="image" src="https://github.com/user-attachments/assets/1c8d63bd-8684-4803-90ba-32e85567851e" />
+
+This reveals a web application running **CMS Made Simple v2.2.8**.
+
+---
+
+<img width="1362" height="666" alt="image" src="https://github.com/user-attachments/assets/710ca90e-f613-497f-85d5-268cd8e1297f" />
+
+
+
+
+
+## 💉 Exploitation
+
+**Q: What's the CVE you're using against the application?**  
+**A:** CVE-2019-9053
+
+
+
+**Q: To what kind of vulnerability is the application vulnerable?**  
+**A:** SQLi (SQL Injection)
+
+### Steps:
+1. Search for the exploit for CMS Made Simple 2.2.8 → [CVE-2019-9053](https://www.exploit-db.com/exploits/46635)
+2. Copy the exploit code, save it to a file, and run it against the target URL.
+3. The exploit dumps the username and a hashed password.
+
+---
+
+## 🔑 Password Cracking with Hydra
+
+Use Hydra to brute-force the credentials:
+
+```bash
+hydra -l <username> -P /usr/share/wordlists/rockyou.txt ssh://<TARGET_IP>
+```
+
+**Q: What's the password?**  
+**A:** `secret`
+
+---
+
+<img width="415" height="82" alt="image" src="https://github.com/user-attachments/assets/4e328588-7571-481b-9966-1f577fcca6c5" />
+
+<img width="665" height="247" alt="image" src="https://github.com/user-attachments/assets/3707985a-37ae-46f3-9e1c-fb397372b9e5" />
+
+
+
+## 🚩 Flags
+
+**Q: What's the user flag?**  
+**A:** `G00d j0b, keep up!`
+
+**Q: Is there any other user in the home directory? What's their name?**  
+**A:** `sunbath`
+
+---
+
+## ⬆️ Privilege Escalation
+
+**Q: What can you leverage to spawn a privileged shell?**  
+**A:** Vim
+
+Use the following to escalate via Vim's sudo misconfiguration:
+
+```bash
+sudo vim -c ':!/bin/sh'
+```
+
+**Q: What's the root flag?**  
+**A:** `W3ll d0n3. You made it!`
+
+---
+
+<img width="450" height="265" alt="image" src="https://github.com/user-attachments/assets/3277bbf3-bdb4-4ad4-a6ed-75ff1d67d94d" />
+
+
+## 🛠️ Tools Used
+
+- `nmap` — port/service enumeration
+- `gobuster` — directory brute-forcing
+- `python` — running the SQLi exploit
+- `hydra` — password brute-forcing
+- `vim` — privilege escalation
+
+---
+
+## 📚 References
+
+- [TryHackMe — Simple CTF](https://tryhackme.com/room/easyctf)
+- [CVE-2019-9053 — CMS Made Simple SQLi](https://www.exploit-db.com/exploits/46635)
+- [CMS Made Simple](http://www.cmsmadesimple.org/)
